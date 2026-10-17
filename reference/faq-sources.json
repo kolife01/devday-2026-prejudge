@@ -1,0 +1,198 @@
+{
+  "retrievedOn": "2026-10-17",
+  "method": "FxTwitter v2 public JSON; code=200 and matching status IDs verified",
+  "scope": "19 posts from supplied root through supplied repository-only post, following replying_to links. Later replies, deleted posts, or branches are not claimed to be covered.",
+  "posts": [
+    {
+      "id": "2111399174914928930",
+      "topic": "参加者の知名度による扱い",
+      "summary": "特定の有名参加者を特別扱いしないという主催者回答の記録。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111399174914928930",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:09:25 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111399354305298489",
+      "topic": "審査基準",
+      "summary": "この時点ではまだ決めていないという回答。",
+      "certainty": "undecided",
+      "url": "https://x.com/hawkymisc/status/2111399354305298489",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:10:08 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111399696862449897",
+      "topic": "電源",
+      "summary": "コンセント・延長ケーブルは不足するため持参が必要。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111399696862449897",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:11:30 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111400190859157974",
+      "topic": "外部API・動画",
+      "summary": "外部APIの利用は可能。予選LLMは動画を読まず、動画の見栄えは後段プレゼンで伝える。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111400190859157974",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:13:28 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111400342953099682",
+      "topic": "スマホ連携",
+      "summary": "PC接続で示すスマホアプリ連携は可能そうだという暫定回答。",
+      "certainty": "tentative",
+      "url": "https://x.com/hawkymisc/status/2111400342953099682",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:14:04 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111400888963359028",
+      "topic": "DevDay加点・モデル",
+      "summary": "公開GitHubを評価する。DevDay関連の評価方法は未決定。AIが読める資料を用意すること、GPT-6.1系を使うことに言及。",
+      "certainty": "reported_with_undecided_rubric",
+      "url": "https://x.com/hawkymisc/status/2111400888963359028",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:16:14 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111401116487561692",
+      "topic": "インジェクション",
+      "summary": "試すこと自体に否定的な回答ではないが、受賞につながるとは考えていないという趣旨。失格や加減点の明文化はない。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111401116487561692",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:17:08 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111401428606672921",
+      "topic": "複数リポジトリ",
+      "summary": "フロント・バックを分ける方式は原則認めず、モノレポにする。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111401428606672921",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:18:23 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111402252200206660",
+      "topic": "ネイティブ成果物",
+      "summary": "Webにデプロイして利用できることが条件。デスクトップやスマホ向けの技術でもWebへ提供する。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111402252200206660",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:21:39 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111402848856707252",
+      "topic": "当日のチーム",
+      "summary": "単独参加の場合は既存チームへ入る想定という説明。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111402848856707252",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:24:01 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111403180592685509",
+      "topic": "開発ハーネス・運営参加",
+      "summary": "自作ハーネス上でCodexを呼んで開発するのは不可。運営者の参加自体は可能。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111403180592685509",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:25:20 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111403384821698620",
+      "topic": "写真・SNS",
+      "summary": "ぬこぬこさんの顔が写る写真の投稿は不可。他の参加者にも配慮する。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111403384821698620",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:26:09 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111403463859179990",
+      "topic": "ハッシュタグ",
+      "summary": "この回答時点では別途案内予定。Lumaには後から確認できるハッシュタグ用リンクあり。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111403463859179990",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:26:28 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111403764905398769",
+      "topic": "賞品案内",
+      "summary": "賞品の詳細はLumaの開催ページを参照するよう案内。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111403764905398769",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:27:40 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111404469401596165",
+      "topic": "既存Pro契約と賞品",
+      "summary": "既存契約との重なりに関する説明あり。受領時点の正式案内で利用条件を確認する。",
+      "certainty": "reported_verify_before_redemption",
+      "url": "https://x.com/hawkymisc/status/2111404469401596165",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:30:28 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111404754618425620",
+      "topic": "APIクレジット",
+      "summary": "OpenAI APIのクレジットという説明。配布単位はこの時点では後報。",
+      "certainty": "undecided_distribution",
+      "url": "https://x.com/hawkymisc/status/2111404754618425620",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:31:36 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111405469491462257",
+      "topic": "ハードウェア系ゲーム",
+      "summary": "専用機で動くゲームでもWeb版で遊べる形なら可能。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111405469491462257",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:34:26 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111405729211113942",
+      "topic": "IDE拡張",
+      "summary": "Visual Studio用拡張だけの成果物は評価しづらいため不可。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111405729211113942",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:35:28 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    },
+    {
+      "id": "2111406160054231526",
+      "topic": "予選・SignIn",
+      "summary": "ChatGPT SignIn利用は可能。予選LLMに渡すものはリポジトリのみで、デプロイ版は後段で操作する。",
+      "certainty": "reported",
+      "url": "https://x.com/hawkymisc/status/2111406160054231526",
+      "author": "hawkymisc",
+      "createdAt": "Sat Oct 17 10:37:11 +0000 2026",
+      "authority": "attendee_report_of_organizer_QA"
+    }
+  ],
+  "eventWebsite": "https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo"
+}

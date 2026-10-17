@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>カウント練習</title>
+<main><h1>カウント練習</h1><p aria-live="polite">現在の数: <output id="count">0</output></p>
+<button id="add">1つ増やす</button><button id="reset">0に戻す</button></main>
+<script>
+const output = document.querySelector('#count');
+document.querySelector('#add').addEventListener('click', () => { output.textContent = String(Number(output.textContent) + 1); });
+document.querySelector('#reset').addEventListener('click', () => { output.textContent = '0'; });
+</script>
+</html>

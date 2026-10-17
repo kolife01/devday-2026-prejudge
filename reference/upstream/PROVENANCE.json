@@ -1,0 +1,168 @@
+{
+  "repository": "https://github.com/schroneko/automated-hachathon-judge",
+  "commit": "f5c843ddad7aea1c68023e145ca9c0be0b575093",
+  "retrievedAt": "2026-10-17T13:43:40.121677+00:00",
+  "scope": "Unmodified source, tests, core docs, package manifest, and worker configuration. Billing-report media and dependency lockfile omitted. Reference only; never executed.",
+  "files": [
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "e13c48929cd0033684022b6c11fa58c0b0c50c08aedde7bbe97739da97c3700c"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "482562e6be0ee57eebd0f60fd93792de0993fa5e44b4a3dad3c32e4194796423"
+    },
+    {
+      "path": "README.md",
+      "sha256": "8171afdf43899ccc839c53f07314b06e5da294a7d694dd5fca7d29041aa5b93a"
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "00bcab85d83b1a0d06b7b8ddac495146292d6ad6968554eb52f967bc48568ac3"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "8ac4a317637b592cbf0658543c7b728477e5952e7454f48215c31c485028526e"
+    },
+    {
+      "path": "docs/deployment.md",
+      "sha256": "0823a1f7ec5a18148b991bfcdb2774519ff78958763e32fd52dd5600b3bc7c67"
+    },
+    {
+      "path": "package.json",
+      "sha256": "7b5cc3d526ede011bbec92e6704267aa55ff5829d9022cf0580179209a2ae870"
+    },
+    {
+      "path": "src/client/main.ts",
+      "sha256": "549697e0c1c4990e22d7db73bc2bab97abe95a77bc6151304d2cc77342cbb8f3"
+    },
+    {
+      "path": "src/client/style.css",
+      "sha256": "e4afedb6fb98a2fbefde6037425e91f9bbbd927c20cad06bc876df8d88a3954a"
+    },
+    {
+      "path": "src/container/github.ts",
+      "sha256": "3837b32bd189238d7e4565180338364e9f60d48af57dd19d3e948e783644d0b1"
+    },
+    {
+      "path": "src/container/scorer.ts",
+      "sha256": "387ac8327377af11500c17e9bee8cc616dabc06d4c1800776e316b00bb26a6ac"
+    },
+    {
+      "path": "src/container/workspace.ts",
+      "sha256": "7ef6d5cf1ae72987628b06114d36979e43ada1c3d9d1d3240950e17bec2a341e"
+    },
+    {
+      "path": "src/runner/config.ts",
+      "sha256": "6e3fcd7307f021cccbaeced4ad393b8a0936a376fd63594e1a5001f945248848"
+    },
+    {
+      "path": "src/runner/index.ts",
+      "sha256": "5be16325ddb9983ffae4516a5eb87d3ab12b33a93337260083b5ec00de007277"
+    },
+    {
+      "path": "src/shared/constants.ts",
+      "sha256": "1cfe61a72c765ead2f5112886bce161199566c1adf74df14ad43cc8178ea6834"
+    },
+    {
+      "path": "src/shared/json.ts",
+      "sha256": "b386721afc165f188609166cc0ad54b13812cddfaab26d60d4b19fafa270a4b0"
+    },
+    {
+      "path": "src/shared/nuko-score.ts",
+      "sha256": "cf23492ca14ca1be34b530fc9f3c1fd29a23f068380d685837319ee52df374b3"
+    },
+    {
+      "path": "src/shared/prompt.ts",
+      "sha256": "6b2028783980d6830b36a9624c9f6d66b55312b24edba11503533d3f5976b937"
+    },
+    {
+      "path": "src/shared/scoring.ts",
+      "sha256": "ecf43ed414f5980a0358778c823b1508b172ddd3dcc316bf7a31cbdb80c4684f"
+    },
+    {
+      "path": "src/shared/types.ts",
+      "sha256": "8710eef0cba7723f9b915ac402391543795be66fd6c213e73da6eb697c96223e"
+    },
+    {
+      "path": "src/shared/validation.ts",
+      "sha256": "1d43ba7b35d1079486a361921a28bae190c1ed805c36ac73af942984648a827c"
+    },
+    {
+      "path": "src/worker/api.ts",
+      "sha256": "7b288d9b20fb44a87a2f413ab6cf89d707d082081c1925173e104cd6abb07f09"
+    },
+    {
+      "path": "src/worker/env.d.ts",
+      "sha256": "bdc609f7e948a0ea3192eefaba75200346f8d1da1a858ef5893984287c9fc1e8"
+    },
+    {
+      "path": "src/worker/index.ts",
+      "sha256": "0772d6a5c1585c50f1862cdb5557b11bef4fbcbe19bede5e34eab434f7801abc"
+    },
+    {
+      "path": "src/worker/judge-state.ts",
+      "sha256": "e0adeb888c8f40fe6f1936ad843c04ff234441756579e0cf72e178e46881c72c"
+    },
+    {
+      "path": "src/worker/state-machine.ts",
+      "sha256": "a298e00930334ddd68f1f2eec47fc80745762125a610dd655ca2512e29de01c1"
+    },
+    {
+      "path": "src/worker/state-persistence.ts",
+      "sha256": "32f1bc5126ffc22418d41d0eda5d6ef861b9a57e23525f2d912545f4e2be4791"
+    },
+    {
+      "path": "src/worker/state-write-budget.ts",
+      "sha256": "3a3d3faeb6f8de52f6a2314b908bd28ad5bb0ad986d4d92af6f66a15a3ef5c8c"
+    },
+    {
+      "path": "tests/api.test.ts",
+      "sha256": "ced0532a66c136f64c6dbf65ec5b9fd702d2f8384c1f65028ca58c405285fd16"
+    },
+    {
+      "path": "tests/cloudflare-workers.ts",
+      "sha256": "2b570c14b06b66845e0e0afd5a698ca45702115cfe138b71aef14cd20677b8e6"
+    },
+    {
+      "path": "tests/nuko-score.test.ts",
+      "sha256": "01b400df930e8e2612c1febcc8ab127aadcbb08c78861cdc98b5c78671484fcf"
+    },
+    {
+      "path": "tests/prompt.test.ts",
+      "sha256": "9f3b6469f48a9b3ed11a56650c6f37c0875fc65c042748245d42676b6c4b3df2"
+    },
+    {
+      "path": "tests/runner-config.test.ts",
+      "sha256": "87c68276eb0531d65fa4bbdb790170ef71bfa8fe29e4d6e2d332622ab3f079a1"
+    },
+    {
+      "path": "tests/runner-runtime.test.ts",
+      "sha256": "8d7303b1249d0cee3024cf42e67d2bbe65bbedf9a128ccecf601e3d583449177"
+    },
+    {
+      "path": "tests/state-machine.test.ts",
+      "sha256": "d6f020a45a0c4dbbfa0ccb1394277640ed112042c5eceb55199b7e136ce8fc3c"
+    },
+    {
+      "path": "tests/state-persistence.test.ts",
+      "sha256": "9d69c02434f4e7a4abb7f49543235a25e44e0845a6883dcd39c7d24458847d65"
+    },
+    {
+      "path": "tests/state-write-budget.test.ts",
+      "sha256": "08b0966b2dd7564e33e8c189ba413f00f19cf58c5ba6bd4d61736a3a4a9bd175"
+    },
+    {
+      "path": "tests/validation.test.ts",
+      "sha256": "a3e4aa3751808f46595aabe8059678ae72631ea9401dd9a60bd8fa9818efb414"
+    },
+    {
+      "path": "tests/zero-score.test.ts",
+      "sha256": "32b1af9f70b534280045142d5a1d345dee6f0ca2b5ae28f16cb6b11b0b2fdfa2"
+    },
+    {
+      "path": "wrangler.jsonc",
+      "sha256": "0734dd646260810b67aa42e7d6336443e241de04a2545e734b90b78d18ecd226"
+    }
+  ]
+}

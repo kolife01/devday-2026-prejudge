@@ -1,0 +1,23 @@
+{
+  "id": "devday-tokyo-2026-provisional-v1",
+  "official": false,
+  "basis": "Previous public judge's four equally weighted criteria; October weights and exact prompt were undecided in the supplied FAQ.",
+  "upstreamRepository": "https://github.com/schroneko/automated-hachathon-judge",
+  "upstreamCommit": "f5c843ddad7aea1c68023e145ca9c0be0b575093",
+  "defaultModel": "gpt-6.1-sol",
+  "modelBasis": "FAQ reports the GPT-6.1 family; Sol and medium effort are this tool's choices, not confirmed organizer settings.",
+  "criteria": [
+    { "key": "technical", "label": "技術的な実装", "max": 10, "focus": "完成度、設計、堅牢性、セキュリティ" },
+    { "key": "ux", "label": "デザインとユーザー体験", "max": 10, "focus": "UI構造、操作の流れ、一貫性、アクセシビリティ。取得したリポジトリの証拠だけで判断" },
+    { "key": "impact", "label": "潜在的なインパクト", "max": 10, "focus": "課題の重要性、対象ユーザー、実用性、成長可能性" },
+    { "key": "idea", "label": "アイデアの質", "max": 10, "focus": "独創性、課題と解決策の適合、着眼点" }
+  ],
+  "anchors": {
+    "0": "評価可能な証拠なし",
+    "1-2": "ごく初期・最小限",
+    "3-4": "一部は成立しているが大きな不足がある",
+    "5-6": "基準に到達",
+    "7-8": "明確に強い",
+    "9-10": "ハッカソン作品として突出"
+  }
+}

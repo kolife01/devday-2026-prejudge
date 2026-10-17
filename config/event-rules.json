@@ -1,0 +1,21 @@
+{
+  "event": "DevDay Community Hackathon Tokyo 2026-10-18",
+  "asOf": "2026-10-17 Asia/Tokyo",
+  "authorityNote": "Luma is the event page. X sources are Hawkie's public reports of organizer Q&A, not a separately published official rubric.",
+  "eventUrl": "https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo",
+  "checks": [
+    { "id": "public_repository", "label": "公開GitHubリポジトリ", "rule": "予選は公開GitHubリポジトリで評価する。Privateの事前採点は準備用であり、そのままでは提出要件を満たさない。", "source": "https://x.com/hawkymisc/status/2111400888963359028", "authority": "faq_report" },
+    { "id": "monorepo", "label": "主要実装が1つのモノレポ", "rule": "フロントとバックエンドを別リポジトリにする方式は原則不可。外部API利用自体は可。パス名だけでは主要実装が揃っていると断定しない。", "source": "https://x.com/hawkymisc/status/2111401428606672921", "authority": "faq_report" },
+    { "id": "web_delivery", "label": "Web公開できる成果物", "rule": "成果物はWebにデプロイされたものに限る。ネイティブ・拡張だけでは不可。Webでも遊べるゲーム等は可。URL記載と稼働確認は区別する。", "source": "https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo", "authority": "event_website" },
+    { "id": "codex_development", "label": "開発手段がCodex CLI / App", "rule": "提出作品の開発はCodex CLI/App。Claude Code、Cursor/Devin経由、自作ハーネス上でCodexを呼ぶ開発は不可。リポジトリから作成者の全作業を検証できないのでunknownとする。", "source": "https://x.com/hawkymisc/status/2111403180592685509", "authority": "event_website_and_faq_report" },
+    { "id": "unpublished_prototype", "label": "事前準備は未公開プロトタイプまで", "rule": "事前の完成品は不可、SNS等で未公開の新規プロトタイプは可。過去の公開状況や当日の作業範囲はリポジトリの自己申告だけでは確認できずunknown。", "source": "https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo", "authority": "event_website" },
+    { "id": "team_size", "label": "チームは2〜4人", "rule": "2〜4人のチームで参加。README上のメンバー数は自己申告なので、参加者登録の確認まではunknown。", "source": "https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo", "authority": "event_website" }
+  ],
+  "context": [
+    { "fact": "予選のLLMに渡すのはリポジトリのみ。デプロイ済み成果物は後段で触る。ChatGPT SignInの利用は可。", "source": "https://x.com/hawkymisc/status/2111406160054231526", "certainty": "reported" },
+    { "fact": "外部API利用は可。動画は予選では読み込まれない。", "source": "https://x.com/hawkymisc/status/2111400190859157974", "certainty": "reported" },
+    { "fact": "評価はGPT-6.1系という説明。具体的な採点基準・DevDay関連の加点方法はこの時点では未決定。", "source": "https://x.com/hawkymisc/status/2111400888963359028", "certainty": "reported_undecided_rubric" },
+    { "fact": "スマホアプリ連携の可否は暫定的な回答。Web公開条件と組み合わせ、個別条件を確認する。", "source": "https://x.com/hawkymisc/status/2111400342953099682", "certainty": "tentative" },
+    { "fact": "プロンプトインジェクションは受賞につながるとは限らないとの回答。正式な失格規則・点数計算は示されていない。", "source": "https://x.com/hawkymisc/status/2111401116487561692", "certainty": "reported" }
+  ]
+}
