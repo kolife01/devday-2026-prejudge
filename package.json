@@ -1,9 +1,9 @@
 {
   "name": "devday-2026-prejudge",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
-  "description": "Private repository-only rehearsal judge for DevDay Community Hackathon Tokyo 2026",
+  "description": "Repository-only rehearsal evaluator aligned with the published DevDay 2026 judge",
   "engines": { "node": ">=22" },
   "scripts": {
     "judge": "node src/cli.mjs judge",

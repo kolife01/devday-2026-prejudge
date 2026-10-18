@@ -23,7 +23,7 @@ async function fixture(fn, options = {}) {
   delete env.OPENAI_API_KEY;
   delete env.NODE_OPTIONS;
   const execute = (args = [], extraEnv = {}) => run(process.execPath,
-    ['--import', preload, cli, ...args, '--snapshot', input, '--out', out], { cwd: dir, env: { ...env, ...extraEnv } });
+    ['--import', preload, cli, ...args, '--profile', 'legacy-44', '--snapshot', input, '--out', out], { cwd: dir, env: { ...env, ...extraEnv } });
   try { await fn({ dir, s, out, called, execute }); }
   finally { await rm(dir, { recursive: true, force: true }); }
 }

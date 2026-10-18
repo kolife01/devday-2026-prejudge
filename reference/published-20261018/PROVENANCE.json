@@ -1,0 +1,56 @@
+{
+  "repository": "https://github.com/schroneko/automated-hachathon-judge",
+  "commit": "23016a7dcfe71cf67a3d9405a84ff3b9021e203c",
+  "retrievedAt": "2026-10-19",
+  "scope": "Unmodified selected source files; no submission snapshots, results, credentials or deployment configuration.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "482562e6be0ee57eebd0f60fd93792de0993fa5e44b4a3dad3c32e4194796423"
+    },
+    {
+      "path": "src/shared/constants.ts",
+      "sha256": "b0e6dfbd373d19791f4c4c5c9d46b83b298cace8c4a7eaa70c597e72279c5574"
+    },
+    {
+      "path": "src/shared/decision-conditions.ts",
+      "sha256": "a08ae40924dd52e13bd271018e8025e28a3cb76d2142d62f7f8d576db4dcb87e"
+    },
+    {
+      "path": "src/shared/devday-reference.ts",
+      "sha256": "2958c853ac8d9554f9ce3558ffe47659c615410cff6d981db8ac1d90eae25248"
+    },
+    {
+      "path": "src/shared/prompt.ts",
+      "sha256": "87549c78eec69b4235ecf05abdf3999d9766a37c915149fd67e56c8ebb5cfaef"
+    },
+    {
+      "path": "src/shared/rubric.ts",
+      "sha256": "5626d75da68eed2d0ba4beeaebca79a654e06584b3228da493a1389d56323517"
+    },
+    {
+      "path": "src/shared/model-evidence.ts",
+      "sha256": "49a7c6b797126505468d74071cde4eed749ef62f76d839bb0b18040f6a965128"
+    },
+    {
+      "path": "src/shared/validation.ts",
+      "sha256": "8a3227e1043867fab199a8d01c7d09e6338b5ff9cac3fbb0cdd1ad4e748485df"
+    },
+    {
+      "path": "src/shared/pricing.ts",
+      "sha256": "abae661b5c82d1979b2005062735c286265f48cd6c11c66b19328370482698f3"
+    },
+    {
+      "path": "src/container/github.ts",
+      "sha256": "23fb21033a0f2525cf7b544b7c0056ae9482048973c6a54c1a223d81efc13412"
+    },
+    {
+      "path": "src/container/reviewed-assets.ts",
+      "sha256": "e1be6d8a9f9b7fc412514c1ad5ef1cb2f1a77b7196437ee47e2d0e3e02e69750"
+    },
+    {
+      "path": "src/container/scorer.ts",
+      "sha256": "605760274adbbba46d8aae953e17fce137550f31df51300f3629169078b0c32d"
+    }
+  ]
+}

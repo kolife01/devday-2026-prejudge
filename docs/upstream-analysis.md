@@ -1,5 +1,7 @@
 # 前回審査コードのロジックと要点
 
+履歴資料です。「現在の公開main」は2026-10-17の取得時点を指します。10月18日の新版と変更履歴は[公開実装の仕様と差分](published-judge.md)に記載し、既定の実行方式もpublished-v4へ変更しています。
+
 対象: [schroneko/automated-hachathon-judge](https://github.com/schroneko/automated-hachathon-judge)
 
 固定した公開版: [`f5c843ddad7aea1c68023e145ca9c0be0b575093`](https://github.com/schroneko/automated-hachathon-judge/tree/f5c843ddad7aea1c68023e145ca9c0be0b575093)。2026-10-17に取得。これは現在の公開mainの分析であり、7月当日のデプロイ設定や10月本番の実装と同一だと確認したものではありません。
