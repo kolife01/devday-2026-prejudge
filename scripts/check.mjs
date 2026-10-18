@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
+import { renderRubricDocument } from '../src/rubric.mjs';
 
 for (const folder of ['src', 'scripts', 'tests']) {
   for (const name of await readdir(folder)) {
@@ -9,6 +10,7 @@ for (const folder of ['src', 'scripts', 'tests']) {
   }
 }
 for (const name of await readdir('config')) if (name.endsWith('.json')) JSON.parse(await readFile(join('config', name), 'utf8'));
+if (await readFile('docs/scoring-rubric.md', 'utf8') !== renderRubricDocument()) throw new Error('Rubric docs drift: run npm run rubric');
 const base = 'reference/upstream';
 const manifest = JSON.parse(await readFile(join(base, 'PROVENANCE.json'), 'utf8'));
 for (const f of manifest.files) {

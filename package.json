@@ -1,6 +1,6 @@
 {
   "name": "devday-2026-prejudge",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "Private repository-only rehearsal judge for DevDay Community Hackathon Tokyo 2026",
@@ -10,6 +10,7 @@
     "snapshot": "node src/cli.mjs snapshot",
     "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "rubric": "node scripts/rubric.mjs"
   }
 }

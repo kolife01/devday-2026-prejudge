@@ -2,76 +2,123 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdtemp, writeFile, readFile, rm, chmod } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, readdir, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { finishSnapshot } from '../src/evidence.mjs';
-import { rubric, rules } from '../src/scoring.mjs';
+import { rules, rubric, jsonHash } from '../src/rubric.mjs';
+import { snapshot } from './helpers/fixtures.mjs';
 const run = promisify(execFile);
+const cli = resolve('src/cli.mjs');
+const preload = resolve('tests/helpers/mock-fetch.mjs');
+const key = 'offline-test-key-never-valid';
 
-test('snapshot CLI never invokes model and refuses output overwrite', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'judge-cli-test-'));
-  try {
-    const s = finishSnapshot({ repo: 'fixture', url: null, pinnedSha: 'a'.repeat(40), defaultBranch: 'main', source: 'local-head', visibility: 'unknown', dirty: false,
-      totalEntries: 1, selectedPaths: ['README.md'], files: [{ path: 'README.md', content: 'a', size: 1, originalSize: 1, truncated: false }], totalBytes: 1, omitted: [] });
-    const input = join(dir, 'input.json'); await writeFile(input, JSON.stringify(s));
-    const out = join(dir, 'output');
-    const args = ['src/cli.mjs', 'snapshot', '--snapshot', input, '--out', out];
-    const response = await run(process.execPath, args, { env: { ...process.env, PREJUDGE_CODEX_BIN: '/nonexistent' } });
-    assert(response.stdout.includes('LLM採点は未実行'));
-    assert.equal(JSON.parse(await readFile(join(out, 'evidence.json'), 'utf8')).pinnedSha, s.pinnedSha);
-    const savedRules = JSON.parse(await readFile(join(out, 'event-rules.json'), 'utf8'));
-    assert.equal(savedRules.asOf, rules.asOf);
-    assert(savedRules.checks.some(c => c.id === 'no_prior_hackathon_submission'));
-    await assert.rejects(run(process.execPath, args), /EEXIST/);
-  } finally { await rm(dir, { recursive: true, force: true }); }
-});
+async function fixture(fn, options = {}) {
+  const dir = await mkdtemp(join(tmpdir(), 'prejudge-cli-'));
+  const s = snapshot(options);
+  const input = join(dir, 'input.json');
+  const out = join(dir, 'output');
+  const called = join(dir, 'fetch-called');
+  await writeFile(input, JSON.stringify(s));
+  const env = { ...process.env, PREJUDGE_TEST_EXPECT_KEY: key, PREJUDGE_TEST_CALLED: called };
+  delete env.OPENAI_API_KEY;
+  delete env.NODE_OPTIONS;
+  const execute = (args = [], extraEnv = {}) => run(process.execPath,
+    ['--import', preload, cli, ...args, '--snapshot', input, '--out', out], { cwd: dir, env: { ...env, ...extraEnv } });
+  try { await fn({ dir, s, out, called, execute }); }
+  finally { await rm(dir, { recursive: true, force: true }); }
+}
 
-test('model tool activity fails without publishing a score', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'judge-tool-test-'));
-  try {
-    const fake = join(dir, 'fake-codex.mjs');
-    await writeFile(fake, `#!/usr/bin/env node\nif(process.argv.includes('--version')){console.log('fake 1');process.exit(0)}\nprocess.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'item.started',item:{type:'command_execution'}}));setTimeout(()=>process.exit(0),50)});\n`);
-    await chmod(fake, 0o755);
-    const s = finishSnapshot({ repo: 'fixture', url: null, pinnedSha: 'a'.repeat(40), defaultBranch: 'main', source: 'local-head', visibility: 'unknown', dirty: false,
-      totalEntries: 1, selectedPaths: ['README.md'], files: [{ path: 'README.md', content: 'a', size: 1, originalSize: 1, truncated: false }], totalBytes: 1, omitted: [] });
-    const input = join(dir, 'input.json'); await writeFile(input, JSON.stringify(s));
-    const out = join(dir, 'output');
-    await assert.rejects(run(process.execPath, [resolve('src/cli.mjs'), 'judge', '--snapshot', input, '--out', out], { env: { ...process.env, PREJUDGE_CODEX_BIN: fake } }), /ツール動作/);
-    const failure = JSON.parse(await readFile(join(out, 'failure.json'), 'utf8'));
-    assert.equal(failure.scored, false);
+for (const args of [['snapshot'], ['judge', '--dry-run']]) test(`${args.join(' ')} needs no key, saves exact input, never calls API, and refuses overwrite`, async () => {
+  await fixture(async ({ out, s, called, execute }) => {
+    const result = await execute(args);
+    assert(result.stdout.includes('API採点は未実行'));
+    const request = JSON.parse(await readFile(join(out, 'request.json'), 'utf8'));
+    assert.equal(JSON.parse(request.input).contentHash, s.contentHash);
+    assert.equal(request.questions.filter(q => q.type === 'score').length, 4);
+    assert.equal(JSON.parse(await readFile(join(out, 'event-rules.json'), 'utf8')).asOf, rules.asOf);
+    assert.equal(JSON.parse(await readFile(join(out, 'rubric.json'), 'utf8')).id, rubric.id);
+    await assert.rejects(readFile(called), /ENOENT/);
     await assert.rejects(readFile(join(out, 'result.json')), /ENOENT/);
-  } finally { await rm(dir, { recursive: true, force: true }); }
+    await assert.rejects(execute(args), /EEXIST/);
+  });
 });
 
-test('successful CLI validates final JSON and retains nonfatal runtime diagnostics', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'judge-success-test-'));
-  try {
-    const answer = { summary: 'テスト結果。', criteria: rubric.criteria.map(c => ({ key: c.key, label: c.label, score: 1, reason: '材料あり。', evidencePaths: ['README.md'], gaps: [] })),
-      total: 4, ruleChecks: rules.checks.map(c => ({ id: c.id, status: 'unknown', reason: '未確認。', evidencePaths: [] })),
-      devdayUsage: { observed: '未確認。', evidencePaths: [], uncertainty: '追加確認。' }, improvements: [], uncertainties: ['稼働は未確認。'] };
-    const fake = join(dir, 'fake-codex.mjs');
-    await writeFile(fake, `#!/usr/bin/env node\nimport { writeFileSync } from 'node:fs';\nif(process.argv.includes('--version')){console.log('fake 1');process.exit(0)}\nprocess.stdin.resume();process.stdin.on('end',()=>{\nconsole.log(JSON.stringify({type:'item.completed',item:{type:'error',message:'Nonfatal diagnostic'}}));\nwriteFileSync(process.argv[process.argv.indexOf('--output-last-message')+1],JSON.stringify(${JSON.stringify(answer)}));\nconsole.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:10,output_tokens:10}}));\n});\n`);
-    await chmod(fake, 0o755);
-    const s = finishSnapshot({ repo: 'fixture', url: null, pinnedSha: 'a'.repeat(40), defaultBranch: 'main', source: 'local-head', visibility: 'unknown', dirty: false,
-      totalEntries: 1, selectedPaths: ['README.md'], files: [{ path: 'README.md', content: 'a', size: 1, originalSize: 1, truncated: false }], totalBytes: 1, omitted: [] });
-    const input = join(dir, 'input.json'); await writeFile(input, JSON.stringify(s));
-    const out = join(dir, 'output');
-    const response = await run(process.execPath, [resolve('src/cli.mjs'), 'judge', '--snapshot', input, '--out', out], { env: { ...process.env, PREJUDGE_CODEX_BIN: fake } });
-    assert(response.stdout.includes('4 / 40'));
+test('absent key saves material and failure, does not call API or fabricate zero score', async () => {
+  await fixture(async ({ out, called, execute }) => {
+    await assert.rejects(execute(['judge']), /OPENAI_API_KEYが未設定/);
+    assert.equal(JSON.parse(await readFile(join(out, 'failure.json'), 'utf8')).scored, false);
+    await readFile(join(out, 'request.json'));
+    await assert.rejects(readFile(called), /ENOENT/);
+    await assert.rejects(readFile(join(out, 'result.json')), /ENOENT/);
+    await assert.rejects(readFile(join(out, 'report.md')), /ENOENT/);
+  });
+});
+
+test('judge auto-loads .env and creates v3 scores with distributions and reproducible hashes', async () => {
+  await fixture(async ({ dir, out, called, execute }) => {
+    await writeFile(join(dir, '.env'), `# Local test only\nOPENAI_API_KEY=${key}\n`);
+    const response = await execute(['judge']);
+    assert(response.stdout.includes('27.10 / 40'));
+    assert.equal(await readFile(called, 'utf8'), 'called');
     const result = JSON.parse(await readFile(join(out, 'result.json'), 'utf8'));
-    assert.deepEqual(result.runtime.warnings, ['Nonfatal diagnostic']);
-    assert.equal(result.official, false);
-    assert.equal(result.version, 2);
-    assert.equal(result.criteriaOfficial, true);
-    assert.equal(result.scoringScaleOfficial, false);
-    assert.equal(result.rulesAsOf, rules.asOf);
-    assert.equal(result.rubricId, 'devday-tokyo-2026-official-criteria-v2');
-    assert.deepEqual(result.result.criteria.map(c => c.key), ['new_features', 'usability', 'usefulness', 'originality']);
+    const request = JSON.parse(await readFile(join(out, 'request.json'), 'utf8'));
     const savedRubric = JSON.parse(await readFile(join(out, 'rubric.json'), 'utf8'));
-    assert.equal(savedRubric.criteriaOfficial, true);
-    assert.equal(savedRubric.scoringScaleOfficial, false);
+    assert.equal(result.version, 3); assert.equal(result.official, false);
+    assert.equal(result.criteriaOfficial, true); assert.equal(result.scoringScaleOfficial, false);
+    assert.equal(result.rubricId, rubric.id); assert.equal(result.rulesAsOf, rules.asOf);
+    assert.equal(result.requestHash, jsonHash(request)); assert.equal(result.rubricHash, jsonHash(savedRubric));
+    assert.equal(result.runtime.api, 'decisions'); assert.equal(result.runtime.reportedModel, 'gpt-6-luna');
+    assert.equal(result.result.total, 7.4 + 6.2 + 8 + 5.5);
+    assert.equal(result.result.criteria[0].probabilities.length, 11);
     assert(!result.snapshot.files[0].content);
-    assert((await readFile(join(out, 'report.md'), 'utf8')).includes('Nonfatal diagnostic'));
-  } finally { await rm(dir, { recursive: true, force: true }); }
+    assert.equal((await stat(out)).mode & 0o777, 0o700);
+    for (const name of await readdir(out)) {
+      assert(!(await readFile(join(out, name), 'utf8')).includes(key), name);
+      assert.equal((await stat(join(out, name))).mode & 0o777, 0o600);
+    }
+    assert(!response.stdout.includes(key)); assert(!response.stderr.includes(key));
+    assert((await readFile(join(out, 'report.md'), 'utf8')).includes('作品固有の講評ではなく'));
+  });
+});
+
+test('existing OPENAI_API_KEY takes precedence over .env', async () => {
+  await fixture(async ({ dir, execute }) => {
+    await writeFile(join(dir, '.env'), 'OPENAI_API_KEY=unused-file-key\n');
+    await execute(['judge'], { OPENAI_API_KEY: key });
+  });
+});
+
+for (const mode of ['refusal', 'missing', 'unauthorized']) test(`${mode} does not produce a report or result, and never saves a key`, async () => {
+  await fixture(async ({ dir, out, execute }) => {
+    await writeFile(join(dir, '.env'), `OPENAI_API_KEY=${key}\n`);
+    await assert.rejects(execute(['judge'], { PREJUDGE_TEST_MODE: mode }), error => !error.stderr.includes(key));
+    assert.equal(JSON.parse(await readFile(join(out, 'failure.json'), 'utf8')).scored, false);
+    await assert.rejects(readFile(join(out, 'result.json')), /ENOENT/);
+    await assert.rejects(readFile(join(out, 'report.md')), /ENOENT/);
+    for (const name of await readdir(out)) assert(!(await readFile(join(out, name), 'utf8')).includes(key));
+  });
+});
+
+test('private snapshots require explicit --allow-private, including offline preparation', async () => {
+  await fixture(async ({ execute }) => {
+    await assert.rejects(execute(['snapshot']), /allow-private/);
+    await execute(['snapshot', '--allow-private']);
+  }, { visibility: 'private' });
+});
+
+test('unsupported model and removed effort option fail before producing a request', async () => {
+  await fixture(async ({ out, execute }) => {
+    await assert.rejects(execute(['judge', '--model', 'gpt-6.1-sol']), /対応モデル/);
+    await assert.rejects(execute(['judge', '--effort', 'medium']), /effort/);
+    await assert.rejects(readFile(join(out, 'request.json')), /ENOENT/);
+  });
+});
+
+test('.env is ignored and .env.sample is trackable with a blank key only', async () => {
+  await run('git', ['check-ignore', '--no-index', '-q', '.env']);
+  await run('git', ['check-ignore', '--no-index', '-q', '.env.local']);
+  await assert.rejects(run('git', ['check-ignore', '--no-index', '-q', '.env.sample']));
+  const sample = await readFile('.env.sample', 'utf8');
+  assert.match(sample, /^OPENAI_API_KEY=$/m);
+  assert.equal(sample.split('\n').filter(line => line && !line.startsWith('#')).length, 1);
 });

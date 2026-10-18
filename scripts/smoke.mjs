@@ -8,7 +8,9 @@ try {
   const git = args => execFileSync('git', ['-C', directory, ...args], { stdio: 'pipe' });
   git(['init', '-b', 'main']); git(['add', '.']);
   git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'Synthetic evaluation fixture']);
-  console.log('架空サンプルを実モデルで採点します。Codexの利用枠を消費します。');
+  console.log(process.argv.includes('--dry-run')
+    ? '架空サンプルの送信予定データを作成します。APIは呼びません。'
+    : '架空サンプルをDecisions APIで採点します。.envのキーを使い、OpenAI API利用料が発生します。');
   const child = spawn(process.execPath, [resolve('src/cli.mjs'), 'judge', '--local', directory, ...process.argv.slice(2)], { stdio: 'inherit' });
   const code = await new Promise((res, rej) => { child.on('error', rej); child.on('close', res); });
   process.exitCode = code ?? 1;

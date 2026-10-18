@@ -1,132 +1,162 @@
 # DevDay 2026 Prejudge
 
-**10月18日のDevDay Community Hackathon Tokyoに向けた、非公式の事前採点ツールです。**
-公開済みの過去審査コードを分析し、今回の確定ルールに合わせて、GitHubリポジトリだけをCodex CLI経由のモデルへ渡して採点します。既定モデルはGPT-6.1 Solです。
+**GitHubリポジトリのテキストを、OpenAI Decisions APIで4カテゴリー・各0〜10点で評価する非公式の事前採点ツールです。**
 
-**2026-10-18に提供された確定ルールの4観点へ更新済みです。** 公式の配点・重みは示されていないため、各0〜10点・等配点・合計40点は本ツールの仮の目安です。本番点数・順位・通過確率ではありません。参加ルールの確認は点数と別に行います。
+「新機能の活用・使いやすさ・有用性・独創性」は、2026-10-18に提供されたハッカソンの公式4観点です。各点の定義・等配点・合計40点はこのツール独自の基準で、本番点数・順位・通過確率を再現するものではありません。参加ルールは点数と別に確認します。
 
-| 公式の観点 | 評価すること | 本ツールの仮配点 |
+| カテゴリー | 評価すること | 範囲 |
 |---|---|---:|
-| 新機能の活用 | DevDay 2026発表の機能が、目的に合う形で使われているか | 10 |
-| 使いやすさ | 他の人にとって使いやすいか | 10 |
-| 有用性 | 他の人にとって今後役に立つ可能性があるか | 10 |
-| 独創性 | 着眼点や解決方法にオリジナリティがあるか | 10 |
+| 新機能の活用 | DevDay 2026の発表機能を、目的に合った形で実装・活用しているか | 0〜10 |
+| 使いやすさ | 初めて使う人が迷わず操作でき、結果を理解し、失敗から復帰できるか | 0〜10 |
+| 有用性 | 誰のどの課題を改善し、今後も役立つ可能性を裏付けられるか | 0〜10 |
+| 独創性 | 着眼点や解決方法の工夫が、作品固有の価値として実装されているか | 0〜10 |
 
-新機能の利用は点数に含みます。機能名だけでなく、目的・実装・入出力との対応を評価します。前回コードの「技術的な実装」という独立項目は廃止し、技術上の根拠は該当する4観点へ反映します。
+**[全44段階の採点基準](docs/scoring-rubric.md)** に、カテゴリーごとの0点・1点・…・10点を明文化しています。[config/rubric.json](config/rubric.json)を正本に、説明資料とAPIの`score`質問を生成します。説明した基準と実際にモデルへ渡す基準が一致します。
 
-## まず読む
+## セットアップ
 
-- [前回コードのロジック・要点](docs/upstream-analysis.md)
-- [今回のルールと未確認事項](docs/event-rules.md)
-- [更新に使った確定ルールの提供本文](reference/event-rules-2026-10-18.md)
-- [指定されたFAQスレッド19件の要約](docs/faq-notes.md)
-- [提出READMEの下書きテンプレート](templates/SUBMISSION_README.md)
-- [検証済み範囲](docs/validation.md)
-
-## 使い方
-
-Node.js 22以上、Git、GitHub CLI `gh`、Codex CLIが必要です。npm依存パッケージはありません。Codex CLI 0.155.1で検証しています。
+Node.js 22以上が必要です。GitHubからの収集にはGitHub CLI `gh`、ローカルHEADからの収集にはGitが必要です。npm依存パッケージやCodexへのログインは不要です。
 
 ```bash
 git clone git@github.com:kolife01/devday-2026-prejudge.git
 cd devday-2026-prejudge
-gh auth status
-codex login status
+cp .env.sample .env
 ```
 
-まずモデルを呼ばず、実際に選ばれる評価材料を確認します。
+初回コピー後、`.env`の`OPENAI_API_KEY=`の右側にOpenAI APIキーを記入します。`.env`と`.env.*`はGitから除外し、空欄の`.env.sample`だけを管理します。既存の`.env`がある場合はコピーせず、そのファイルを編集してください。
+
+`judge`は**実行ディレクトリの`.env`を自動で読み込みます**。`source .env`は不要です。すでに同名の環境変数が設定されている場合は、その値を優先します。
+
+キーは後から設定できます。`snapshot`、`judge --dry-run`、`npm test`はキー不要です。
+
+## 使い方
+
+### キーなしで評価材料と送信内容を確認
 
 ```bash
 npm run snapshot -- --repo OWNER/REPO
+# または
+npm run judge -- --repo OWNER/REPO --dry-run
 ```
 
-採点して日本語レポートを生成します。既存のCodexログインと利用枠を使います。
+GitHubを読む場合は`gh auth status`で認証状態を確認してください。上記はOpenAI APIを呼びません。`coverage.md`に取得範囲、`evidence.json`に本文、`request.json`に実際の送信予定データと全質問を保存します。
+
+### .envにキーを入れた後、採点
 
 ```bash
 npm run judge -- --repo OWNER/REPO
 ```
 
-公開前の自分のリポジトリも準備用として読めます。公開状態の変更は行いません。
+`POST https://api.openai.com/v1/decisions`を1回呼びます。モデルは、2026-10-19に確認した[公式仕様](https://developers.openai.com/api/docs/guides/decisions)で対応する`gpt-6-luna`です。OpenAI APIの利用料が発生します。CodexのChatGPTログインや利用枠は使いません。
+
+Privateの自分のリポジトリを準備用として読む場合:
 
 ```bash
 npm run judge -- --repo OWNER/PRIVATE-REPO --allow-private
 ```
 
-ローカルでは、コミット済みHEADだけを読みます。未コミット変更や未追跡ファイルは含みません。
+公開状態は変更しません。Privateの保存済みスナップショットにも`--allow-private`が必要です。
+
+ローカルのコミット済みHEADを読む場合:
 
 ```bash
 npm run judge -- --local /absolute/path/to/candidate-repository
 ```
 
-保存した同じ材料で再評価する場合:
+未コミット変更・未追跡ファイルは含めません。対象のコード、テスト、ビルドは実行しません。
+
+保存した同じ材料を新しい基準で再評価する場合:
 
 ```bash
-npm run judge -- --snapshot runs/PREVIOUS-RUN/evidence.json --model gpt-6.1-sol --effort medium
+npm run judge -- --snapshot runs/PREVIOUS-RUN/evidence.json
 ```
 
-`--out runs/NAME`で保存先、`--timeout 240`で採点待ち時間を指定できます。既存フォルダは上書きしません。`--help`で全オプションを確認できます。
+旧バージョンの`evidence.json`も利用できます。`request.json`はその時点の基準で再生成するので、過去runと比較するときは`rubricId`と`rubricHash`も確認してください。公開状態などのメタデータも保存時の情報を使い、再取得はしません。
 
-### GPT-6.1が利用できないとき
+`--out runs/NAME`で保存先、`--timeout 240`でAPI待ち時間を指定できます。既存フォルダは上書きしません。`--help`で全オプションを表示します。
 
-2026-10-17のこのMacのCodexログインでは、`gpt-6.1-sol`指定がサーバーから未対応として拒否されました。ツールは失敗を記録して停止し、モデルを勝手に変えません。利用可能なモデルで参考採点をする場合は明示してください。モデルが違う点はレポートにも残ります。
+### 点数とレポートの読み方
 
-```bash
-npm run judge -- --repo OWNER/REPO --model gpt-6-sol
-```
+各カテゴリーに11段階の`levels`を渡し、Decisions APIの`score`を受け取ります。たとえば7点の確率が60%、8点が40%なら**7.4点**です。4カテゴリーの未丸め値を足して40点満点とし、Markdownのみ小数2桁で表示します。整数化やボーナス加点はしません。
 
-GPT-6.1系を使える環境では既定コマンドのまま実行できます。`snapshot`だけならモデル接続は不要です。出力された`prompt.md`をGPT-6.1が利用できるCodexへ渡して検討することもできますが、その手作業の回答はCLIの検証済み結果とは区別してください。
+1回のリクエストには、4つの採点質問、4つの関連ファイル選択、2つのルール確認とその関連ファイル選択、合計12質問を含めます。採点結果に依存した追加呼び出しは行いません。
+
+レポートには次を表示します。
+
+- 4項目の点数、confidence、0〜10の全段階の確率。
+- 最も確率が高い段階の定義と、次段階に向けて確認する条件。
+- モデルが別の`choice`質問で選んだ関連ファイル候補。
+- 点数と独立したルール確認、証拠の範囲と未確認事項。
+
+**Decisions APIは自由文の講評を返しません。** 段階の説明は設定済みの定義を転記したものです。「次段階の条件」を作品の欠陥と断定したり、選ばれたファイルを引用付きの採点理由として扱ったりしません。関連ファイルが特定できない場合はその旨を明示し、APIの点数を勝手に0へ置換しません。confidenceも通過確率や実測の正解率ではありません。
 
 ## 出力
 
-`runs/<日時>-<対象>/`に保存します。このディレクトリはGit管理対象外です。
+`runs/<日時>-<対象>/`に保存します。Git管理対象外です。フォルダは所有者のみアクセス可能、生成ファイルは所有者のみ読み書き可能にします。
 
 | ファイル | 内容 |
 |---|---|
-| `report.md` | 4項目の点数、根拠、不足、ルール確認、修正優先順 |
-| `result.json` | 検証済みの構造化結果、SHA、モデル指定、利用トークン等 |
-| `coverage.md` | 読まれた/読まれなかったファイル、切り詰め、未コミット差分の注意 |
-| `evidence.json` | 採点に渡したテキストとSHA256ハッシュ |
-| `prompt.md` | 実際に渡した入力。対象コードを含むため共有範囲に注意 |
-| `rubric.json` | その回の公式4観点、仮の配点、独自の評価指針 |
-| `event-rules.json` | その回に適用したルール、基準日、各項目の根拠 |
-| `nuko-score.json` | 前回コードのインジェクション兆候スコア。40点には加減しない |
-| `failure.json` | 失敗時のみ。失敗を採点成功や0点扱いにしない |
+| `report.md` | 点数、段階の定義、確率、関連ファイル候補、ルール確認 |
+| `result.json` | v3形式の結果、SHA、基準とリクエストのハッシュ、モデル、API使用量 |
+| `response.json` | 検証済みのAPI応答フィールド。任意の追加フィールドやエラー本文は保存しない |
+| `coverage.md` | 読んだ/読まなかったファイル、切り詰め、未コミット差分の注意 |
+| `evidence.json` | 評価対象のテキスト、SHA、証拠ハッシュ |
+| `request.json` | APIに送るJSON本文そのもの。キー・認証ヘッダーは含まない |
+| `prompt.md` | 全質問・段階定義・inputの読みやすい表示 |
+| `rubric.json` | その回の44段階の定義と共通方針 |
+| `event-rules.json` | 適用ルール・基準日・出典 |
+| `nuko-score.json` | 過去コード由来のインジェクション兆候値。40点には加減しない |
+| `failure.json` | キー不足やAPI・検証失敗時のみ。失敗を採点成功や0点にしない |
 
-## 採点の前提
+`snapshot`と`--dry-run`では結果・応答・レポートを作りません。読めるテキストが0件の場合は材料だけ保存し、送信JSONも作りません。保存された本文には候補作品のソースが含まれます。
 
-1. GitHubのデフォルトブランチのSHA、またはローカルHEADを固定します。
-2. 過去コードと同じ優先順位で最大24ファイルを選び、同じ文字切り詰め処理をします。
-3. Codexへテキストを直接渡します。候補リポジトリのコード・テスト・ビルドは実行しません。
-4. Codexのユーザー設定・プラグイン・シェル・Web検索・メモリ等を無効にした一時セッションで1回採点します。
-5. 点数合計、項目重複、根拠ファイル、ルール状態を検証してからレポートを出します。
+## 実装上の前提
 
-Private入力は `--allow-private` が必要です。ローカル入力のGitHub公開状態は確認できないためunknownになります。ファイル名による秘密情報除外は網羅的ではありません。モデルへ渡す内容は`coverage.md`と`evidence.json`で確認できます。
+- GitHubのデフォルトブランチのSHA、またはローカルHEADを固定します。
+- 前回公開審査コードの優先順位・切り詰めを引き継ぎ、最大24ファイルを選びます。10月本番でも同じ収集方式を使うかは未確認です。
+- リンク先、画像、動画、Git履歴は取得しません。評価対象のコードを実行する機能はありません。
+- 4カテゴリーと11段階、APIの応答数・名前・型・値域・確率分布・加重平均を検証します。回答拒否や一部回答の欠落も採点失敗として扱います。
+- APIタイムアウトは本文受信まで含みます。リダイレクト、再試行、モデルの自動切替は行いません。認証情報やAPIのエラー本文をログに出しません。
+- 公開状態はスナップショットのメタデータから判定します。制作ツール、事前公開、過去の提出歴、人数は人が確認するため`unknown`です。
+- Web公開・モノレポの判定は資料内の根拠に限ります。Webサイトの稼働確認は別途必要です。
 
-## 本番との違い
+## 以前のCodex CLI版からの変更
 
-- 4観点は確定しています。**公式の配点・重み、詳細な採点プロンプト、effort、ファイル収集方式は未確認**です。評価指針と0〜10点のアンカーは本ツール独自のものです。
-- 本番予選は**GPT-6.1 SolあるいはDecisions APIを予定**。本ツールはCodex CLI経由のみで、Decisions APIによる評価は実装していません。本戦の審査方法も未決定です。
-- DevDay新機能の目的に合った活用を1つの正式な観点として採点し、4観点以外のボーナスは加えません。
-- 取得した証拠の不足と、作品に実装が存在しないことを区別します。
-- 当日の参加条件や制作手段はコードだけでは証明できず、人による確認が残ります。
-- GitHub収集時のMIME判定は上流同様、ローカル/Privateはテキスト判定を近似します。
-- 上流より追加で、典型的な秘密ファイル名、symlink、NULを含むbinaryを除外します。
-- 審査サーバー、公開ランキング、Cloudflareへのデプロイはありません。ローカル実行のみです。
+実行経路をDecisions APIへ置き換えました。`PREJUDGE_CODEX_BIN`、Codexログイン、`--effort`、旧モデル指定は使いません。現在は`--model gpt-6-luna`のみを受け付け、他モデルを指定すると送信前に停止します。
 
-ハッカソン中の開発に使えるのは**Codex CLI / Codex App / ChatGPT Work**です。Claude Code、CursorやDevin経由のOpenAIモデル、OpenAI OAuthを使うサードパーティのハーネスは禁止されています。事前準備は未公開の新規プロトタイプまでで、他ハッカソンの提出作品の改修は不可です。DevDay関連情報の事前調査は推奨されています。
+`result.json`は整数の点数と自由文の講評を持つv2から、小数の点数・分布・定義への対応を持つv3へ変更しました。旧結果を自動変換せず、保存済み`evidence.json`を再採点します。旧点数との厳密な比較や本番との一致は検証していません。
 
-本ツールは事前の証拠収集・参考採点用で、作品の生成・修正ループを持ちません。この設計が当日の使用許可を意味するわけではなく、利用範囲は主催者の案内を優先してください。提出作品でChatGPT SignInを利用できるというFAQ回答も、開発用ハーネスの許可とは別です。
+## ルール・調査資料
 
-今回のルール更新はユーザー提供本文に基づきます。開催ページを今回再取得したものではありません。旧バージョンの点数とは観点が異なるため直接比較せず、必要なら保存済み`evidence.json`で再採点してください。出力の`rubricId`と`rulesAsOf`に適用版を記録します。
+- [今回のルールと未確認事項](docs/event-rules.md)
+- [提供された確定ルール本文](reference/event-rules-2026-10-18.md)
+- [前回公開コードのロジックと要点](docs/upstream-analysis.md)
+- [指定FAQスレッド19件の要約](docs/faq-notes.md)
+- [提出READMEテンプレート](templates/SUBMISSION_README.md)
+- [検証済み範囲](docs/validation.md)
 
-## 検証
+本番予選は提供ルール上「GPT-6.1 SolあるいはDecisions APIを予定」で、採用方式・配点・モデル設定は未確認です。本ツールの設定が主催者のものと一致するとは主張しません。
+
+ハッカソン中の開発手段は**Codex CLI / Codex App / ChatGPT Work**。Claude Code、Cursor/Devin経由のOpenAIモデル、OpenAI OAuthを使うサードパーティハーネスは禁止されています。事前準備は未公開の新規プロトタイプまでで、他ハッカソン提出作品の改修は不可。DevDay関連の下調べは推奨されています。
+
+このツールは証拠収集と参考採点用で、作品の生成・修正ループを持ちません。当日の利用可否は主催者の案内を優先してください。イベントルールは2026-10-18のユーザー提供本文に基づき、この変更で開催ページを再取得したものではありません。
+
+## 検証と基準の更新
 
 ```bash
 npm run check
 npm test
+# config/rubric.jsonの定義を変えたら資料も再生成
+npm run rubric
 ```
 
-実モデルの疎通テストは架空サンプルを採点します。Codex利用枠を消費します。
+架空サンプルで送信前の確認をする場合:
+
+```bash
+npm run smoke -- --dry-run
+```
+
+`.env`設定後の実API疎通確認（課金あり）:
 
 ```bash
 npm run smoke
@@ -134,12 +164,11 @@ npm run smoke
 
 ## 出典
 
-- [2026-10-18に提供された確定ルール本文](reference/event-rules-2026-10-18.md)
+- [確定ルールの提供本文](reference/event-rules-2026-10-18.md)
+- [OpenAI Decisionsガイド](https://developers.openai.com/api/docs/guides/decisions)
+- [OpenAI Decisions APIリファレンス](https://developers.openai.com/api/reference/resources/decisions/methods/create)
 - [前回の公開審査実装](https://github.com/schroneko/automated-hachathon-judge/tree/f5c843ddad7aea1c68023e145ca9c0be0b575093)
 - [今回の開催要項](https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo)
-- [予選はリポジトリのみというFAQ](https://x.com/hawkymisc/status/2111406160054231526)
-- [FAQスレッドの起点](https://x.com/hawkymisc/status/2111399174914928930)
-- [公式Codexコマンド仕様](https://learn.chatgpt.com/docs/developer-commands#codex-exec)
-- [公式モデル情報](https://learn.chatgpt.com/docs/models#gpt-6.1-sol)
+- [リポジトリのみの予選というFAQ](https://x.com/hawkymisc/status/2111406160054231526)
 
-上流のソース・テスト・主要資料40ファイルを[reference/upstream](reference/upstream)に改変せず保存しています。固定SHAと各ファイルのSHA256は[PROVENANCE.json](reference/upstream/PROVENANCE.json)。第三者コードの権利表記は[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)を参照してください。
+上流40ファイルは[reference/upstream](reference/upstream)に改変せず保存しています。固定SHA・各ファイルのハッシュは[PROVENANCE.json](reference/upstream/PROVENANCE.json)、権利表記は[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)を参照してください。
