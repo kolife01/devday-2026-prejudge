@@ -1,16 +1,20 @@
 {
-  "id": "devday-tokyo-2026-provisional-v1",
+  "id": "devday-tokyo-2026-official-criteria-v2",
   "official": false,
-  "basis": "Previous public judge's four equally weighted criteria; October weights and exact prompt were undecided in the supplied FAQ.",
+  "criteriaOfficial": true,
+  "scoringScaleOfficial": false,
+  "source": "reference/event-rules-2026-10-18.md",
+  "basis": "2026-10-18にユーザーが提供した確定ルールの4観点と説明文を採用。評価の細則・プロンプトは本ツール独自のもの。",
+  "scaleNote": "公式の配点・重みは未公表。各0〜10点、等配点、合計40点、共通アンカーは比較用の仮定であり、公式点数ではない。",
   "upstreamRepository": "https://github.com/schroneko/automated-hachathon-judge",
   "upstreamCommit": "f5c843ddad7aea1c68023e145ca9c0be0b575093",
   "defaultModel": "gpt-6.1-sol",
-  "modelBasis": "FAQ reports the GPT-6.1 family; Sol and medium effort are this tool's choices, not confirmed organizer settings.",
+  "modelBasis": "予選はGPT-6.1 SolあるいはDecisions APIによる自動評価を予定。本ツールはCodex CLI経由のGPT-6.1 Solを既定にする。Decisions APIは未実装。effort mediumは本ツールの選択であり、公式設定ではない。",
   "criteria": [
-    { "key": "technical", "label": "技術的な実装", "max": 10, "focus": "完成度、設計、堅牢性、セキュリティ" },
-    { "key": "ux", "label": "デザインとユーザー体験", "max": 10, "focus": "UI構造、操作の流れ、一貫性、アクセシビリティ。取得したリポジトリの証拠だけで判断" },
-    { "key": "impact", "label": "潜在的なインパクト", "max": 10, "focus": "課題の重要性、対象ユーザー、実用性、成長可能性" },
-    { "key": "idea", "label": "アイデアの質", "max": 10, "focus": "独創性、課題と解決策の適合、着眼点" }
+    { "key": "new_features", "label": "新機能の活用", "max": 10, "focus": "DevDay 2026で発表された機能を、目的に合った形で活用しているか？", "guidance": "発表機能の名称・出典の記述、実際の呼び出しと入出力、目的への貢献を対応させる。名称だけの記載、未接続のコード、将来の予定を実利用と扱わない。" },
+    { "key": "usability", "label": "使いやすさ", "max": 10, "focus": "他の人にとって使いやすいものになっているか？", "guidance": "初めて使う人の操作、入力例、説明、エラーや待ち時間への対応を取得済みのコードと資料から評価する。実際に操作したとは主張しない。" },
+    { "key": "usefulness", "label": "有用性", "max": 10, "focus": "他の人にとって今後どれだけ役に立つ可能性があるか？", "guidance": "対象ユーザーの課題と利用場面、実装済みの解決方法、利用前後の変化、今後の利用可能性を根拠にする。未検証の市場規模や利用実績を補わない。" },
+    { "key": "originality", "label": "独創性", "max": 10, "focus": "着眼点や解決方法にオリジナリティがあるか？", "guidance": "課題の捉え方と解決の工夫、従来の方法との具体的な違いを確認する。外部の競合調査を実施したとは主張しない。" }
   ],
   "anchors": {
     "0": "評価可能な証拠なし",

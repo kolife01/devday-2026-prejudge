@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { normalizeRepo, pathPriority, selectFiles, collectEvidence, collectLocal, finishSnapshot, validateSnapshot, inferContentType } from '../src/evidence.mjs';
-import { buildPrompt, validateResult, rules, rubric } from '../src/scoring.mjs';
+import { buildPrompt, validateResult, rules, rubric, outputSchema } from '../src/scoring.mjs';
 import { calculateNukoScore, visibleNukoScore } from '../src/nuko-score.mjs';
 import { codexArgs, scorerEnvironment, runtimeError } from '../src/codex.mjs';
 import { coverageReport, renderReport } from '../src/report.mjs';
@@ -17,7 +17,7 @@ const snapshot = () => finishSnapshot({ repo: 'sample/app', url: null, pinnedSha
 function validResult() {
   return { summary: '試作用作品。', criteria: rubric.criteria.map(c => ({ key: c.key, label: c.label, score: 5, reason: '記述あり。', evidencePaths: ['README.md'], gaps: ['実行は未確認。'] })),
     total: 20, ruleChecks: rules.checks.map(r => ({ id: r.id, status: 'unknown', reason: '要確認。', evidencePaths: [] })),
-    devdayUsage: { observed: 'APIの実装は未確認。', evidencePaths: [], uncertainty: '加点基準未公開。' },
+    devdayUsage: { observed: '機能と目的の記述あり。', evidencePaths: ['README.md'], uncertainty: '実際の稼働は未確認。' },
     improvements: [{ priority: 'P1', title: '根拠を補う', action: '実装への参照を記載する。', reason: '材料が少ない。', evidencePaths: ['README.md'] }], uncertainties: ['デプロイ稼働は未確認。'] };
 }
 
@@ -123,13 +123,56 @@ test('visibility comes from metadata, human-attested checks cannot pass, bonus p
   assert.throws(() => validateResult(r, s), /Human-attested/);
 });
 
-test('prompt uses only supplied evidence and declares provisional rubric', () => {
+test('prompt uses supplied evidence with official criteria and a provisional scale', () => {
   const prompt = buildPrompt(snapshot());
-  assert(prompt.includes('仮基準'));
+  assert(prompt.includes('公式の4観点'));
+  assert(prompt.includes('仮の配点'));
   assert(prompt.includes('ツールを一切使わず'));
   assert(prompt.includes('動画'));
   assert(prompt.includes('gpt-6.1-sol'));
   assert(prompt.includes('"content":"hello"'));
+});
+
+test('new official criteria replace the legacy axes in schema, scoring, and reports', () => {
+  const expected = ['new_features', 'usability', 'usefulness', 'originality'];
+  assert.deepEqual(outputSchema.properties.criteria.items.properties.key.enum, expected);
+  const current = validResult();
+  assert.deepEqual(current.criteria.map(c => c.label), ['新機能の活用', '使いやすさ', '有用性', '独創性']);
+  current.criteria.find(c => c.key === 'new_features').score = 8;
+  current.total = 23;
+  assert.equal(validateResult(current, snapshot()).total, 23);
+  const report = renderReport({ snapshot: snapshot(), result: current, nukoScore: { raw: 0, visible: null }, runtime: {} });
+  assert(report.includes('| 新機能の活用 | 8/10 |'));
+  assert(report.includes('公式4観点・仮の配点'));
+  assert(!report.includes('技術的な実装'));
+  const legacy = validResult();
+  legacy.criteria = ['technical', 'ux', 'impact', 'idea'].map((key, i) => ({ ...legacy.criteria[i], key }));
+  assert.throws(() => validateResult(legacy, snapshot()), /Invalid criterion/);
+});
+
+test('new feature use is scored for purpose and implementation, not treated as undecided', () => {
+  const prompt = buildPrompt(snapshot());
+  assert(prompt.includes('新機能の活用はnew_featuresとして採点'));
+  assert(prompt.includes('devdayUsageにはこの点数を支える'));
+  assert(prompt.includes('目的に合う形で実際に使われているか'));
+  assert(prompt.includes('2026年の発表機能であるという根拠が入力にない場合は推測せず'));
+  assert(!prompt.includes('加点方法が未決定'));
+  assert(!prompt.includes('過去コードから借用した仮基準'));
+});
+
+test('updated development restrictions and prior submissions remain human checks', () => {
+  const prompt = buildPrompt(snapshot());
+  for (const value of ['Codex CLI / Codex App / ChatGPT Work', 'Claude Code', 'Cursor', 'Devin', 'OpenAI OAuth', 'サードパーティ', 'no_prior_hackathon_submission', 'チューンナップ', '事前調査は許可']) assert(prompt.includes(value));
+  assert(prompt.includes('提出作品のChatGPT SignIn・外部API利用が可能というFAQと、開発手段の禁止を混同しない'));
+  assert(outputSchema.properties.ruleChecks.items.properties.id.enum.includes('no_prior_hackathon_submission'));
+  for (const id of ['codex_development', 'unpublished_prototype', 'no_prior_hackathon_submission', 'team_size']) {
+    const result = validResult();
+    result.ruleChecks.find(c => c.id === id).status = 'evidenced';
+    assert.throws(() => validateResult(result, snapshot()), /Human-attested/);
+  }
+  const missing = validResult();
+  missing.ruleChecks = missing.ruleChecks.filter(c => c.id !== 'no_prior_hackathon_submission');
+  assert.throws(() => validateResult(missing, snapshot()), /incomplete/);
 });
 
 test('Codex invocation is noninteractive, ephemeral, read-only, with user config and tool features disabled', () => {

@@ -3,12 +3,12 @@ import { parseArgs } from 'node:util';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
 import { collectGithub, collectLocal, validateSnapshot } from './evidence.mjs';
-import { rubric, buildPrompt, validateResult } from './scoring.mjs';
+import { rubric, rules, buildPrompt, validateResult } from './scoring.mjs';
 import { runCodex } from './codex.mjs';
 import { calculateNukoScore, visibleNukoScore } from './nuko-score.mjs';
 import { coverageReport, renderReport } from './report.mjs';
 
-const help = `DevDay 2026 非公式事前採点（仮の4項目40点）
+const help = `DevDay 2026 非公式事前採点（公式4観点・仮の配点40点）
 
   npm run snapshot -- --repo owner/repo
   npm run judge -- --repo owner/repo
@@ -56,6 +56,7 @@ async function main() {
   await save('coverage.md', coverageReport(snapshot));
   await save('prompt.md', prompt);
   await save('rubric.json', rubric);
+  await save('event-rules.json', rules);
   const raw = calculateNukoScore(snapshot.files);
   await save('nuko-score.json', { raw, visible: visibleNukoScore(raw), affectsTotal: false });
   if (command === 'snapshot') {
@@ -67,13 +68,14 @@ async function main() {
     const evaluated = await runCodex(prompt, { model, effort, timeoutMs: timeout * 1000,
       onProgress: phase => console.error(phase === 'thread.started' ? '採点セッションを開始しました。' : 'モデルの回答を検証しています。') });
     const result = validateResult(evaluated.result, snapshot);
-    const envelope = { version: 1, official: false, createdAt: new Date().toISOString(), rubricId: rubric.id,
+    const envelope = { version: 2, official: false, createdAt: new Date().toISOString(), rubricId: rubric.id,
+      criteriaOfficial: rubric.criteriaOfficial, scoringScaleOfficial: rubric.scoringScaleOfficial, rulesAsOf: rules.asOf,
       sourceCommit: rubric.upstreamCommit,
       snapshot: { ...snapshot, files: snapshot.files.map(({ content, ...rest }) => rest) },
       runtime: evaluated.runtime, result, nukoScore: { raw, visible: visibleNukoScore(raw), affectsTotal: false } };
     await save('result.json', envelope);
     await save('report.md', renderReport(envelope));
-    console.log(`参考点: ${result.total} / 40\nレポート: ${join(out, 'report.md')}\n読んだ範囲: ${join(out, 'coverage.md')}\n公式の採点基準・通過予測ではありません。`);
+    console.log(`参考点: ${result.total} / 40\nレポート: ${join(out, 'report.md')}\n読んだ範囲: ${join(out, 'coverage.md')}\n公式4観点・仮の配点による非公式の参考点です。予選通過予測ではありません。`);
   } catch (error) {
     await save('failure.json', { completed: false, scored: false, error: error.message, requestedModel: model, at: new Date().toISOString() });
     throw new Error(`${error.message}\n採点は未確定です。保存済み材料: ${out}`);

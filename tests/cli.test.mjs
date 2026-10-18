@@ -20,6 +20,9 @@ test('snapshot CLI never invokes model and refuses output overwrite', async () =
     const response = await run(process.execPath, args, { env: { ...process.env, PREJUDGE_CODEX_BIN: '/nonexistent' } });
     assert(response.stdout.includes('LLM採点は未実行'));
     assert.equal(JSON.parse(await readFile(join(out, 'evidence.json'), 'utf8')).pinnedSha, s.pinnedSha);
+    const savedRules = JSON.parse(await readFile(join(out, 'event-rules.json'), 'utf8'));
+    assert.equal(savedRules.asOf, rules.asOf);
+    assert(savedRules.checks.some(c => c.id === 'no_prior_hackathon_submission'));
     await assert.rejects(run(process.execPath, args), /EEXIST/);
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
@@ -59,6 +62,15 @@ test('successful CLI validates final JSON and retains nonfatal runtime diagnosti
     const result = JSON.parse(await readFile(join(out, 'result.json'), 'utf8'));
     assert.deepEqual(result.runtime.warnings, ['Nonfatal diagnostic']);
     assert.equal(result.official, false);
+    assert.equal(result.version, 2);
+    assert.equal(result.criteriaOfficial, true);
+    assert.equal(result.scoringScaleOfficial, false);
+    assert.equal(result.rulesAsOf, rules.asOf);
+    assert.equal(result.rubricId, 'devday-tokyo-2026-official-criteria-v2');
+    assert.deepEqual(result.result.criteria.map(c => c.key), ['new_features', 'usability', 'usefulness', 'originality']);
+    const savedRubric = JSON.parse(await readFile(join(out, 'rubric.json'), 'utf8'));
+    assert.equal(savedRubric.criteriaOfficial, true);
+    assert.equal(savedRubric.scoringScaleOfficial, false);
     assert(!result.snapshot.files[0].content);
     assert((await readFile(join(out, 'report.md'), 'utf8')).includes('Nonfatal diagnostic'));
   } finally { await rm(dir, { recursive: true, force: true }); }
