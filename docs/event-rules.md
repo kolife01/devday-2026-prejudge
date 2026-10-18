@@ -1,5 +1,7 @@
 # 今回のルールと採点への反映
 
+**2026-10-19追記:** 下記は提供ルールと旧legacy-44方式に基づく当時の整理です。後から公開された実装では21 predicate・0.8閾値・偶数段階40点とSolによる理由生成を確認し、現在の既定をpublished-v4へ変更しました。[公開実装の仕様と履歴](published-judge.md)、[現行の段階条件](published-rubric.md)を参照してください。旧formatVersion 1の部分スナップショットは現行方式へ再利用せず、収集し直します。提供本文は改変していません。
+
 対象日・更新日: 2026-10-18（Asia/Tokyo）。今回ユーザーが提供した[確定ルール本文](../reference/event-rules-2026-10-18.md)を優先します。[開催要項](https://luma.com/OpenAIDevDay2026CommunityHackathonTokyo)と[HawkieさんのQ&A記録](faq-notes.md)の2026-10-17取得分は、更新と矛盾しない部分の補足です。今回の更新で開催ページを再取得したわけではありません。
 
 ## 確定した4観点

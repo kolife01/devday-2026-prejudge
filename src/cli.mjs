@@ -9,17 +9,23 @@ import { buildPrompt, buildDecisionRequest, validateDecisionResponse, resultFrom
 import { runDecisions } from './decisions.mjs';
 import { calculateNukoScore, visibleNukoScore } from './nuko-score.mjs';
 import { coverageReport, renderReport } from './report.mjs';
+import { runPublished } from './published-cli.mjs';
 
-const help = `DevDay 2026 非公式事前採点（Decisions API / 4観点・各0〜10点）
+const help = `DevDay 2026 参考採点（公開コード準拠 / 4観点・各0,2,4,6,8,10点）
 
   npm run snapshot -- --repo owner/repo
   npm run judge -- --repo owner/repo --dry-run
   npm run judge -- --repo owner/repo
   npm run judge -- --local /absolute/path/to/repository
   npm run judge -- --snapshot runs/previous/evidence.json
+  node src/cli.mjs explain --from runs/previous
 
 オプション:
   --dry-run               judgeの送信内容だけ保存（キー不要・APIを呼ばない）
+  --profile published-v4  既定。全文収集・21 predicate・Sol medium理由生成
+  --profile legacy-44     旧独自方式。24ファイル・44段階のscore質問
+  --scores-only           published-v4のSol理由生成を省略
+  --from runs/previous    explain専用。保存した点数の理由だけ再生成
   --allow-private         Privateを準備用に評価（公開しない）
   --model gpt-6-luna      Decisions API対応モデル。既定もgpt-6-luna
   --timeout 240           APIのタイムアウト秒（10〜900）
@@ -29,6 +35,7 @@ const help = `DevDay 2026 非公式事前採点（Decisions API / 4観点・各0
 実行したディレクトリの.envを自動読込します。既存の環境変数を優先します。
 snapshotと--dry-runはOpenAI APIを呼びません。GitHub取得は行います。
 judgeはAPIへリポジトリのテキストを送り、OpenAI API利用料が発生します。
+既定ではinput_tokensで容量確認後、DecisionsとResponsesを呼びます。
 Codexログインは不要。--effortは廃止しました。
 ローカル入力はHEADのみ。未コミット変更・未追跡ファイルは読みません。
 公式点数・予選通過予測ではありません。`;
@@ -37,10 +44,16 @@ async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
     repo: { type: 'string' }, local: { type: 'string' }, snapshot: { type: 'string' },
     'allow-private': { type: 'boolean' }, 'dry-run': { type: 'boolean' }, model: { type: 'string' },
+    profile: { type: 'string' }, 'scores-only': { type: 'boolean' }, from: { type: 'string' },
     timeout: { type: 'string' }, out: { type: 'string' }, help: { type: 'boolean', short: 'h' }
   } });
   if (values.help) { console.log(help); return; }
   const command = positionals[0] ?? 'judge';
+  if (positionals.length > 1) throw new Error(help);
+  const profile = values.profile ?? 'published-v4';
+  if (!['published-v4', 'legacy-44'].includes(profile)) throw new Error('profileはpublished-v4またはlegacy-44です。');
+  if (profile === 'published-v4') return runPublished(command, values);
+  if (values.from || values['scores-only']) throw new Error('--from / --scores-onlyはpublished-v4専用です。');
   if (!['judge', 'snapshot'].includes(command) || positionals.length > 1) throw new Error(help);
   if ([values.repo, values.local, values.snapshot].filter(Boolean).length !== 1) throw new Error('--repo / --local / --snapshot のいずれか1つを指定してください。\n' + help);
   const model = values.model ?? rubric.defaultModel;

@@ -22,5 +22,13 @@
     { "fact": "DevDay発表関連情報の事前調査は許可され、推奨されている。デプロイに不慣れな場合は事前の準備も推奨されている。", "source": "reference/event-rules-2026-10-18.md", "certainty": "confirmed_in_supplied_rules" },
     { "fact": "スマホアプリ連携の可否は暫定的な回答。Web公開条件と組み合わせ、個別条件を確認する。", "source": "https://x.com/hawkymisc/status/2111400342953099682", "certainty": "tentative" },
     { "fact": "プロンプトインジェクションは受賞につながるとは限らないとの回答。正式な失格規則・点数計算は示されていない。", "source": "https://x.com/hawkymisc/status/2111401116487561692", "certainty": "reported" }
-  ]
+  ],
+  "publishedImplementation": {
+    "verifiedAt": "2026-10-19 Asia/Tokyo",
+    "authority": "published_source_and_recorded_history",
+    "commit": "23016a7dcfe71cf67a3d9405a84ff3b9021e203c",
+    "source": "https://github.com/schroneko/automated-hachathon-judge/tree/23016a7dcfe71cf67a3d9405a84ff3b9021e203c",
+    "scoring": "21 predicates (20 conditions plus attack), threshold 0.8, consecutive levels 0/2/4/6/8/10 per axis, total 40; Decisions gpt-6-luna plus Responses gpt-6.1-sol medium explanations",
+    "note": "The context array preserves the earlier supplied-rule state. Later source facts are recorded separately; no event-page refetch or production-score equivalence is claimed."
+  }
 }
